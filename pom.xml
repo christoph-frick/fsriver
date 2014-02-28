@@ -16,7 +16,7 @@
     <groupId>fr.pilato.elasticsearch.river</groupId>
     <artifactId>fsriver</artifactId>
     <packaging>jar</packaging>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
     <name>File System River Plugin for ElasticSearch</name>
     <url>http://www.pilato.fr/fsriver</url>
     <description>
@@ -39,7 +39,7 @@
     </licenses>
 
     <properties>
-        <elasticsearch.version>0.90.7</elasticsearch.version>
+        <elasticsearch.version>1.0.1</elasticsearch.version>
         <tika.version>1.4</tika.version>
     </properties>
 

@@ -30,6 +30,7 @@ Versions
 
 |      FS River Plugin    | elasticsearch | Attachment Plugin | Tika | Release date |
 |-------------------------|:-------------:|:-----------------:|:----:|:------------:|
+| 0.6.0-SNAPSHOT (master) |    1.0.1      |      Not used     |  1.4 |              |
 | 0.5.0-SNAPSHOT (master) |    0.90.7     |      Not used     |  1.4 |              |
 | 0.4.0                   |    0.90.7     |      Not used     |  1.4 |  22/12/2013  |
 | 0.3.0                   |    0.90.3     |       1.8.0       |      |  09/08/2013  |
