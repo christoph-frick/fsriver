@@ -9,36 +9,22 @@ This river plugin helps to index documents from your local file system and using
 can access files on the same mounting point. If not, when a node stop, the other node will _think_ that your
 local dir is empty and will **erase** all your docs.
 
-**WARNING**: starting from 0.0.3, you need to have the [Attachment Plugin](https://github.com/elasticsearch/elasticsearch-mapper-attachments). It's not included anymore
-in the distribution.
-
-**WARNING**: starting from 0.4.0, you don't need anymore the Attachment Plugin as we use now directly
-[Tika](http://tika.apache.org/), see [#38](https://github.com/dadoonet/fsriver/issues/38).
-
-Please read documentation relative to the version you are using:
-
-* [0.4.0](https://github.com/dadoonet/fsriver/blob/fsriver-0.4.0/README.markdown#filesystem-river-for-elasticsearch)
-* [0.3.0](https://github.com/dadoonet/fsriver/blob/fsriver-0.3.0/README.markdown#filesystem-river-for-elasticsearch)
-* [0.2.0](https://github.com/dadoonet/fsriver/blob/fsriver-0.2.0/README.markdown#filesystem-river-for-elasticsearch)
-* [0.1.0](https://github.com/dadoonet/fsriver/blob/fsriver-0.1.0/README.markdown#filesystem-river-for-elasticsearch)
-* [0.0.3](https://github.com/dadoonet/fsriver/blob/fsriver-0.0.3/README.markdown#filesystem-river-for-elasticsearch)
-* [0.0.2](https://github.com/dadoonet/fsriver/blob/fsriver-0.0.2/README.markdown#filesystem-river-for-elasticsearch)
-* [0.0.1](https://github.com/dadoonet/fsriver/blob/fsriver-0.0.1/README.markdown#filesystem-river-for-elasticsearch)
-
 Versions
 --------
 
+* For 1.0.x elasticsearch versions, look at [master branch](https://github.com/dadoonet/fsriver/tree/master).
+* For 0.90.x elasticsearch versions, look at [es-0.90 branch](https://github.com/dadoonet/fsriver/tree/es-0.90).
+
 |      FS River Plugin    | elasticsearch | Attachment Plugin | Tika | Release date |
 |-------------------------|:-------------:|:-----------------:|:----:|:------------:|
-| 0.6.0-SNAPSHOT (master) |    1.0.1      |      Not used     |  1.4 |              |
-| 0.5.0-SNAPSHOT (master) |    0.90.7     |      Not used     |  1.4 |              |
-| 0.4.0                   |    0.90.7     |      Not used     |  1.4 |  22/12/2013  |
-| 0.3.0                   |    0.90.3     |       1.8.0       |      |  09/08/2013  |
-| 0.2.0                   |    0.90.0     |       1.7.0       |      |  30/04/2013  |
-| 0.1.0                   | 0.90.0.Beta1  |       1.6.0       |      |  15/03/2013  |
-| 0.0.3                   |    0.20.4     |       1.6.0       |      |  12/02/2013  |
-| 0.0.2                   |    0.19.8     |       1.4.0       |      |  16/07/2012  |
-| 0.0.1                   |    0.19.4     |       1.4.0       |      |  19/06/2012  |
+| 1.1.0-SNAPSHOT          |    1.0.0      |      Not used     |  1.4 |  XXXX-XX-XX  |
+| 1.0.0                   |    1.0.0      |      Not used     |  1.4 |  2014-03-10  |
+
+Please read documentation relative to the version you are using:
+
+* [1.1.0-SNAPSHOT](https://github.com/dadoonet/fsriver/blob/master/README.markdown)
+* [1.0.0](https://github.com/dadoonet/fsriver/blob/fsriver-1.0.0/README.markdown)
+
 
 Build Status
 ------------
@@ -58,18 +44,7 @@ Installation
 Just type :
 
 ```sh
-bin/plugin -install fr.pilato.elasticsearch.river/fsriver/0.4.0
-```
-
-This will do the job...
-
-```
--> Installing fr.pilato.elasticsearch.river/fsriver/0.4.0...
-Trying http://download.elasticsearch.org/fr.pilato.elasticsearch.river/fsriver/fsriver-0.4.0.zip...
-Trying http://search.maven.org/remotecontent?filepath=fr/pilato/elasticsearch/river/fsriver/0.4.0/fsriver-0.4.0.zip...
-Trying https://oss.sonatype.org/service/local/repositories/releases/content/fr/pilato/elasticsearch/river/fsriver/0.4.0/fsriver-0.4.0.zip...
-Downloading ......DONE
-Installed fsriver
+bin/plugin -install fr.pilato.elasticsearch.river/fsriver/1.0.0
 ```
 
 Creating a Local FS river
@@ -110,7 +85,8 @@ We add another river with the following properties :
 * Update Rate: every hour (60 * 60 * 1000 = 3600000 ms)
 * Get only docs like `*.doc`, `*.xls` and `*.pdf`
 
-By the way, we define to index in the same index/type as the previous one:
+By the way, we define to index in the same index/type as the previous one
+(see [Bulk settings](#bulk-settings) for details):
 
 * index: `docs`
 * type: `doc`
@@ -141,6 +117,7 @@ You can now index files remotely using SSH:
 * Username: `username`
 * Password: `password`
 * Protocol: `ssh` (default to `local`)
+* Port: `22` (default to `22`)
 * Update Rate: every hour (60 * 60 * 1000 = 3600000 ms)
 * Get only docs like `*.doc`, `*.xls` and `*.pdf`
 
@@ -150,6 +127,7 @@ curl -XPUT 'localhost:9200/_river/mysshriver/_meta' -d '{
   "fs": {
 	"url": "/tmp3",
 	"server": "mynode.mydomain.com",
+	"port": 22,
 	"username": "username",
 	"password": "password",
 	"protocol": "ssh",
@@ -187,11 +165,6 @@ curl -XPUT 'localhost:9200/_river/mydocs/_meta' -d '{
 	"url": "/tmp",
 	"update_rate": 3600000,
 	"json_support" : true
-  },
-  "index": {
-    "index": "mydocs",
-    "type": "doc",
-    "bulk_size": 50
   }
 }'
 ```
@@ -210,8 +183,7 @@ curl -XPUT 'localhost:9200/_river/mydocs1/_meta' -d '{
   },
   "index": {
     "index": "mydocs",
-    "type": "type1",
-    "bulk_size": 50
+    "type": "type1"
   }
 }'
 
@@ -224,8 +196,7 @@ curl -XPUT 'localhost:9200/_river/mydocs2/_meta' -d '{
   },
   "index": {
     "index": "mydocs",
-    "type": "type2",
-    "bulk_size": 50
+    "type": "type2"
   }
 }'
 ```
@@ -244,8 +215,7 @@ curl -XPUT 'localhost:9200/_river/mydocs1/_meta' -d '{
   },
   "index": {
     "index": "mydocs",
-    "type": "type1",
-    "bulk_size": 50
+    "type": "type1"
   }
 }'
 
@@ -259,8 +229,7 @@ curl -XPUT 'localhost:9200/_river/mydocs2/_meta' -d '{
   },
   "index": {
     "index": "mydocs",
-    "type": "type2",
-    "bulk_size: 50
+    "type": "type2"
   }
 }'
 ```
@@ -277,11 +246,6 @@ curl -XPUT 'localhost:9200/_river/mydocs/_meta' -d '{
 	"update_rate": 3600000,
 	"json_support": true,
 	"filename_as_id": true
-  },
-  "index": {
-    "index": "mydocs",
-    "type": "doc",
-    "bulk_size": 50
   }
 }'
 ```
@@ -300,21 +264,6 @@ curl -XPUT 'localhost:9200/_river/mydocs/_meta' -d '{
 	"add_filesize": false
   }
 }'
-```
-
-Suspend or restart a file river
--------------------------------
-
-If you need to stop a river, you can call the `_stop' endpoint:
-
-```sh
-curl 'localhost:9200/_river/mydocs/_stop'
-```
-
-To restart the river from the previous point, just call `_start` end point:
-
-```sh
-curl 'localhost:9200/_river/mydocs/_start'
 ```
 
 Ignore deleted files
@@ -336,6 +285,21 @@ curl -XPUT 'localhost:9200/_river/mydocs/_meta' -d '{
 
 Advanced
 ========
+
+Suspend or restart a file river
+-------------------------------
+
+If you need to stop a river, you can call the `_stop' endpoint:
+
+```sh
+curl 'localhost:9200/_river/mydocs/_stop'
+```
+
+To restart the river from the previous point, just call `_start` end point:
+
+```sh
+curl 'localhost:9200/_river/mydocs/_start'
+```
 
 Autogenerated mapping
 ---------------------
@@ -375,7 +339,7 @@ When the FSRiver detect a new type, it creates automatically a mapping for this 
         "properties" : {
           "content_type" : {
               "type" : "string",
-              "analyzer" : "simple",
+              "analyzer" : "not_analyzed",
               "store" : "yes"
           },
           "last_modified" : {
@@ -398,7 +362,7 @@ When the FSRiver detect a new type, it creates automatically a mapping for this 
           },
           "filename" : {
               "type" : "string",
-              "analyzer" : "simple",
+              "analyzer" : "not_analyzed",
               "store" : "yes"
           },
           "url" : {
@@ -480,7 +444,7 @@ $ curl -XPUT "http://localhost:9200/docs/doc/_mapping" -d '{
         "properties" : {
           "content_type" : {
               "type" : "string",
-              "analyzer" : "simple",
+              "analyzer" : "not_analyzed",
               "store" : "yes"
           },
           "last_modified" : {
@@ -503,7 +467,7 @@ $ curl -XPUT "http://localhost:9200/docs/doc/_mapping" -d '{
           },
           "filename" : {
               "type" : "string",
-              "analyzer" : "simple",
+              "analyzer" : "not_analyzed",
               "store" : "yes"
           },
           "url" : {
@@ -659,7 +623,7 @@ they disappear from your hard drive.
         "properties" : {
           "content_type" : {
               "type" : "string",
-              "analyzer" : "simple",
+              "analyzer" : "not_analyzed",
               "store" : "yes"
           },
           "last_modified" : {
@@ -682,7 +646,7 @@ they disappear from your hard drive.
           },
           "filename" : {
               "type" : "string",
-              "analyzer" : "simple",
+              "analyzer" : "not_analyzed",
               "store" : "yes"
           },
           "url" : {
@@ -733,11 +697,6 @@ curl -XPUT 'localhost:9200/_river/mydocs/_meta' -d '{
 	"url": "/tmp",
 	"update_rate": 3600000,
 	"store_source": true
-  },
-  "index": {
-    "index": "mydocs",
-    "type": "doc",
-    "bulk_size": 50
   }
 }'
 ```
@@ -822,6 +781,34 @@ characters than the filesize (think compressed files). A value of 1, will extrac
 Note that Tika requires to allocate in memory a data structure to extract text. Setting `indexed_chars` to a high
 number will require more memory!
 
+Bulk settings
+=============
+
+You can change some indexing settings:
+
+* `index.index` sets the index name where your documents will be indexed (default to river name)
+* `index.type` sets the type name for your documents (default to `doc`)
+* `index.bulk_size` set the maximum number of documents per bulk before a bulk is sent to elasticsearch (default to `100`)
+* `index.flush_interval` set the bulk flush interval frequency (default to `5s`). It will be use to process bulk even if
+bulk is not fill with `bulk_size` documents.
+
+For example:
+
+```sh
+curl -XPUT 'localhost:9200/_river/myriver/_meta' -d '{
+  "type": "fs",
+  "fs": {
+	"url": "/sales"
+  },
+  "index": {
+  	"index": "acme",
+  	"type": "sales",
+  	"bulk_size": 10,
+  	"flush_interval": "30s"
+  }
+}'
+```
+
 
 Migrating from version < 0.4.0
 ==============================
@@ -832,13 +819,42 @@ Some important changes have been done in FSRiver 0.4.0:
 * Fields have changed. You should look at [Generated Fields](#generated-fields) section
 to know how the old fields have been renamed.
 
+
+Settings list
+=============
+
+Here is a full list of existing settings:
+
+|               Name               |                                  Documentation                                    |
+|----------------------------------|-----------------------------------------------------------------------------------|
+| `fs.url`                         | [Creating a Local FS river](#creating-a-local-fs-river)                           |
+| `fs.update_rate`                 | [Creating a Local FS river](#creating-a-local-fs-river)                           |
+| `fs.includes`                    | [Creating a Local FS river](#creating-a-local-fs-river)                           |
+| `fs.excludes`                    | [Creating a Local FS river](#creating-a-local-fs-river)                           |
+| `fs.server`                      | [Indexing using SSH](#indexing-using-ssh)                                         |
+| `fs.port`                        | [Indexing using SSH](#indexing-using-ssh)                                         |
+| `fs.username`                    | [Indexing using SSH](#indexing-using-ssh)                                         |
+| `fs.password`                    | [Indexing using SSH](#indexing-using-ssh)                                         |
+| `fs.protocol`                    | [Indexing using SSH](#indexing-using-ssh)                                         |
+| `fs.json_support`                | [Indexing JSon docs](#indexing-json-docs)                                         |
+| `fs.filename_as_id`              | [Indexing JSon docs](#indexing-json-docs)                                         |
+| `fs.add_filesize`                | [Disabling file size field](#disabling-file-size-field)                           |
+| `fs.remove_deleted`              | [Ignore deleted files](#ignore-deleted-files)                                     |
+| `fs.indexed_chars`               | [Extracted characters](#extracted-characters)                                     |
+| `fs.store_source`                | [Storing binary source document](#storing-binary-source-document-base64-encoded)  |
+| `index.index`                    | [Bulk settings](#bulk-settings)                                                   |
+| `index.type`                     | [Bulk settings](#bulk-settings)                                                   |
+| `index.bulk_size`                | [Bulk settings](#bulk-settings)                                                   |
+| `index.flush_interval`           | [Bulk settings](#bulk-settings)                                                   |
+
+
 License
 =======
 
 ```
 This software is licensed under the Apache 2 license, quoted below.
 
-Copyright 2011-2012 David Pilato
+Copyright 2011-2014 David Pilato
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of
